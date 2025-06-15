@@ -27,20 +27,37 @@ data.describe()
 
 data.head()
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+#визуализация признаков
+num_features = ['age', 'fnlwgt', 'education', 'education-num', 'marital-status', 'occupation', 'hours-per-week']
+data[num_features].hist(bins=20, figsize=(10,8))
+plt.show()
+
+#избавляемся от выбросов
+def remove_outliers(df, columns):
+    for col in columns:
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]
+    return df
+
+data = remove_outliers(data, num_features)
+
+data[num_features].hist(bins=20, figsize=(10,8))
+plt.show()
+
 #масштабирование числовых признаков
-num_features = ['fnlwgt', 'education-num', 'capital-gain', 'capital-loss', 'hours-per-week']
 scaler = StandardScaler()
 data[num_features] = scaler.fit_transform(data[num_features])
 
 print(data.describe())
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-data[num_features].hist(bins=20, figsize=(10, 8)) #гистограммы для числовых признаков
-plt.tight_layout()
-plt.show()
-
+#матрица корреляции
 data_corr = data.drop(['fnlwgt', 'race', 'native-country'], axis=1)
 
 corr_matrix = data_corr.corr() 
@@ -115,3 +132,7 @@ for name, model in models.items():
 import joblib
 
 joblib.dump(grid_xgb.best_estimator_, 'best_xgb_model.pkl')
+
+loded_model = joblib.load('best_xgb_model.pkl')
+sample = X_pca[0:1]
+print(f'Предсказание: {loded_model.predict(sample)}')
