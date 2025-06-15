@@ -14,18 +14,40 @@ label_encoder = LabelEncoder()
 data['Type'] = label_encoder.fit_transform(data['Type'])
 data.head()
 
-num_features = ['Air temperature [K]', 'Process temperature [K]', 'Rotational speed [rpm]', 'Torque [Nm]', 'Tool wear [min]']
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#анализ категориального признака Type
+sns.countplot(x='Type', data=data)
+plt.show()
+
+#визуализация признаков
+num_features = ['Type', 'Air temperature [K]', 'Process temperature [K]', 'Rotational speed [rpm]', 'Torque [Nm]', 'Tool wear [min]']
+data[num_features].hist(bins=20, figsize=(10, 8))
+plt.show()
+
+#удаляем выбросы
+def remove_outliers(df, columns):
+    for col in columns:
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]
+    return df
+
+data = remove_outliers(data, num_features)
+
+#визуализация признаков
+num_features = ['Type', 'Air temperature [K]', 'Process temperature [K]', 'Rotational speed [rpm]', 'Torque [Nm]', 'Tool wear [min]']
+data[num_features].hist(bins=20, figsize=(10, 8))
+plt.show()
+
 scaler = StandardScaler() #стандартизация числовых признаков
 data[num_features] = scaler.fit_transform(data[num_features])
 
 print(data.describe()) #описание данных
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-data[num_features].hist(bins=20, figsize=(10, 8)) #гистограммы для числовых признаков
-plt.tight_layout()
-plt.show()
 
 data_corr = data.drop(['Type'], axis=1) #убираем ненужные столбцы
 
@@ -105,3 +127,7 @@ for name, model in models.items():
 import joblib
 
 joblib.dump(grid_rf.best_estimator_, 'best_model.pkl')
+
+loaded_model = joblib.load('best_model.pkl')
+sample = X_pca[0:1] #выбираем первую запись
+print(f'Предсказание: {loaded_model.predict(sample)}')
