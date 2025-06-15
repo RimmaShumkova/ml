@@ -136,3 +136,15 @@ joblib.dump(grid_xgb.best_estimator_, 'best_xgb_model.pkl')
 loded_model = joblib.load('best_xgb_model.pkl')
 sample = X_pca[0:1]
 print(f'Предсказание: {loded_model.predict(sample)}')
+
+### ДЛЯ СПРАВКИ. ###
+
+#ЕСЛИ ЕСТЬ ПУСТЫЕ СТРОКИ
+
+data_cleaned = data.dropna() # Удаление всех строк, где хотя бы один столбец содержит NaN
+data_cleaned = data.dropna(how='all') # Удаление строк, где все значения NaN
+
+#АЛЬТЕРНАТИВА УДАЛЕНИЮ - ЗАПОЛНЕНИЕ ЗНАЧЕНИЙ
+
+data.fillna(data.mean(), inplace=True) # Заполнение средним/медианным
+data.interpolate(method='linear', inplace=True) # Или интерполяция
