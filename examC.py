@@ -9,6 +9,12 @@ data.head()
 
 print(data.isnull().sum()) #проверка пустых записей
 
+duplicates = data.duplicated()
+print(f"Найдено {duplicates.sum()} дубликатов")
+
+data = data.drop_duplicates()
+print(f"Количество дубликатов после удаления: {duplicates.sum()}")
+
 #кодирование категориальных признаков
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 

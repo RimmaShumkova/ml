@@ -7,6 +7,12 @@ print(data.isnull().sum()) #проверка нулевых значений
 
 data.head()
 
+duplicates = data.duplicated()
+print(f"Найдено {duplicates.sum()} дубликатов")
+
+data = data.drop_duplicates()
+print(f"Количество дубликатов после удаления: {duplicates.sum()}")
+
 data = data.drop(['UDI', 'Product ID'], axis=1)
 
 #кодирование категориальных признаков
@@ -131,3 +137,15 @@ joblib.dump(grid_rf.best_estimator_, 'best_model.pkl')
 loaded_model = joblib.load('best_model.pkl')
 sample = X_pca[0:1] #выбираем первую запись
 print(f'Предсказание: {loaded_model.predict(sample)}')
+
+### ДЛЯ СПРАВКИ. ###
+
+#ЕСЛИ ЕСТЬ ПУСТЫЕ СТРОКИ
+
+data_cleaned = data.dropna() # Удаление всех строк, где хотя бы один столбец содержит NaN
+data_cleaned = data.dropna(how='all') # Удаление строк, где все значения NaN
+
+#АЛЬТЕРНАТИВА УДАЛЕНИЮ - ЗАПОЛНЕНИЕ ЗНАЧЕНИЙ
+
+data.fillna(data.mean(), inplace=True) # Заполнение средним/медианным
+data.interpolate(method='linear', inplace=True) # Или интерполяция
