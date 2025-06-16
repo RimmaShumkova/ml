@@ -149,3 +149,8 @@ data_cleaned = data.dropna(how='all') # Удаление строк, где вс
 
 data.fillna(data.mean(), inplace=True) # Заполнение средним/медианным
 data.interpolate(method='linear', inplace=True) # Или интерполяция
+
+#ЕСЛИ НУЖНО ПОМЕНЯТЬ ТИП ДАННОГО
+
+data['free sulfur dioxide'] = data['free sulfur dioxide'].astype(int) #float в int
+data["Type"] = data["Type"].map({"L": 0, "M": 1, "H": 2}) #object в int
