@@ -100,8 +100,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, precision_score, f1_score
+from imblearn.over_sampling import SMOTE
+
 
 X_train, X_test, y_train, y_test = train_test_split(X_pca, y, test_size=0.2, random_state=42) #разделение данных
+
+smote = SMOTE()
+X_train, y_train = smote.fit_resample(X_train, y_train)
 
 #оценка базовой модели
 base_model = LogisticRegression()
