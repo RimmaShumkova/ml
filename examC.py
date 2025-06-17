@@ -185,6 +185,31 @@ data.interpolate(method='linear', inplace=True) # Или интерполяци�
 data['free sulfur dioxide'] = data['free sulfur dioxide'].astype(int) #float в int
 data["Type"] = data["Type"].map({"L": 0, "M": 1, "H": 2}) #object в int
 
+# One-Hot Encoder
+data_ohe = pd.get_dummies(data['relationship'], prefix='relationship', dtype=int)
+data = pd.concat([data, data_ohe], axis=1)
+data.drop('relationship', axis=1, inplace=True)
+
+# LabelEncoder
+label_encoder = LabelEncoder()
+data['workclass'] = label_encoder.fit_transform(data['workclass'])
+
+# Удаление столбцов
+data = data.drop(["Product ID", "UDI"], axis=1)
+
+# Удаление пустых строк
+data = data.dropna(subset=['RainTomorrow'])
+
+# Обработка пропущенных значений
+data.isna().sum()
+
+# Заполнение значением 0 недостающие значения
+data.fillna({'Sunshine': 0, 'Cloud3pm': 0, 'Cloud9am': 0, 'Rainfall': 0}, inplace=True)
+
+# Заполнение недостающие значения средним
+fill_values = {'Evaporation': data['Evaporation'].mean()}
+data.fillna(fill_values, inplace=True)
+
 '''
 Почему я выбрала метод понижения размерности PCA:
 
