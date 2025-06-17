@@ -13,6 +13,7 @@ duplicates = data.duplicated()
 print(f"Найдено {duplicates.sum()} дубликатов")
 
 data = data.drop_duplicates()
+duplicates = data.duplicated()
 print(f"Количество дубликатов после удаления: {duplicates.sum()}")
 
 #кодирование категориальных признаков
@@ -57,10 +58,6 @@ data = remove_outliers(data, num_features)
 data[num_features].hist(bins=20, figsize=(10,8))
 plt.show()
 
-#масштабирование числовых признаков
-scaler = StandardScaler()
-data[num_features] = scaler.fit_transform(data[num_features])
-
 print(data.describe())
 
 #матрица корреляции
@@ -73,6 +70,29 @@ plt.show()
 sns.countplot(x='salary', data=data) #анализ целевой переменной
 plt.show()
 print(data['salary'].value_counts())
+
+#реализация regplot
+target_column = 'salary'
+
+# Расчет корреляции и выбор топ-3 признаков
+corr_matrix = data.corr()
+target_corr = corr_matrix[target_column].drop(target_column)
+top_3_features = target_corr.abs().nlargest(3).index
+
+# Построение графиков с линией регрессии
+for feature in top_3_features:
+    plt.figure(figsize=(8, 6))
+    sns.regplot(  # Используем regplot вместо scatterplot для линии регрессии
+        x=data[feature], 
+        y=data[target_column],
+        scatter_kws={'alpha': 0.5},  # Прозрачность точек
+        line_kws={'color': 'red'}    # Цвет линии регрессии
+    )
+    plt.title(f'Зависимость: {feature} vs {target_column}\n(Корреляция: {target_corr[feature]:.2f})')
+    plt.xlabel(feature)
+    plt.ylabel(target_column)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.show()
 
 #отбор признаков и масштабирование
 X = data.drop(['salary'], axis=1)
